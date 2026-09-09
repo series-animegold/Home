@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AnimeGold - Login</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: linear-gradient(-45deg, #1a0033, #2d0052, #0a0a2e, #16213e);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Floating particles background */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 152, 0, 0.5);
+      border-radius: 50%;
+      animation: float 20s infinite;
+    }
+
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 80%; top: 80%; animation-delay: 2s; }
+    .particle:nth-child(3) { left: 50%; top: 50%; animation-delay: 4s; }
+    .particle:nth-child(4) { left: 20%; top: 70%; animation-delay: 6s; }
+    .particle:nth-child(5) { left: 90%; top: 30%; animation-delay: 8s; }
+    .particle:nth-child(6) { left: 30%; top: 10%; animation-delay: 10s; }
+    .particle:nth-child(7) { left: 70%; top: 60%; animation-delay: 12s; }
+    .particle:nth-child(8) { left: 15%; top: 50%; animation-delay: 14s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translate(100px, -100px) scale(0.5); opacity: 0; }
+    }
+
+    .section {
+      background: rgba(20, 20, 40, 0.8);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      box-shadow: 0 8px 32px rgba(255, 152, 0, 0.2), 0 0 50px rgba(255, 152, 0, 0.1);
+      padding: 50px 40px;
+      border-radius: 15px;
+      text-align: center;
+      max-width: 400px;
+      animation: slideUp 0.8s ease-out;
+      z-index: 1;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ff9800, #ffb84d, #ff6b00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+      animation: glow 2s ease-in-out infinite;
+      font-weight: bold;
+    }
+
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 152, 0, 0.5)); }
+      50% { filter: drop-shadow(0 0 20px rgba(255, 152, 0, 0.8)); }
+    }
+
+    p {
+      color: #b0b0ff;
+      margin-bottom: 30px;
+      font-size: 0.95em;
+      letter-spacing: 0.5px;
+    }
+
+    input {
+      width: 100%;
+      margin: 12px 0;
+      padding: 12px 15px;
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #ff9800;
+      background: rgba(255, 152, 0, 0.1);
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.4);
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    button {
+      width: 100%;
+      margin: 15px 0;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #ff9800, #ffb84d);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(255, 152, 0, 0.6);
+      background: linear-gradient(135deg, #ffb84d, #ff9800);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(255, 152, 0, 0.4);
+    }
+
+    .error {
+      color: #ff4444;
+      font-size: 14px;
+      margin: 10px 0;
+      min-height: 20px;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .banned-message {
+      color: #ff4444;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(255, 68, 68, 0.2);
+      border: 2px solid rgba(255, 68, 68, 0.5);
+      border-radius: 8px;
+      animation: pulse-ban 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ban {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 68, 68, 0.3); }
+      50% { box-shadow: 0 0 25px rgba(255, 68, 68, 0.6); }
+    }
+
+    .signup-link {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 152, 0, 0.2);
+    }
+
+    .signup-link p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .signup-link a {
+      color: #ffb84d;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .signup-link a:after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #ffb84d;
+      transition: width 0.3s ease;
+    }
+
+    .signup-link a:hover {
+      color: #ff9800;
+    }
+
+    .signup-link a:hover:after {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="section">
+    <h1>⚡ AnimeGold</h1>
+    <p>Sign in with your credentials</p>
+    
+    <input type="text" id="username" placeholder="Username" autocomplete="off"><br>
+    <input type="password" id="password" placeholder="Password" autocomplete="off"><br>
+    
+    <div id="errorMessage" class="error"></div>
+    
+    <button onclick="loginWithCredentials()">Login</button>
+    
+    <div class="signup-link">
+      <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6qQybRVw4nlwGA-Kp8d6kCqOhdqo11Aw",
+      authDomain: "animegold-bf2a7.firebaseapp.com",
+      projectId: "animegold-bf2a7",
+      storageBucket: "animegold-bf2a7.firebasestorage.app",
+      messagingSenderId: "1055086176557",
+      appId: "1:1055086176557:web:aca8f68412e95ef369cba4",
+      measurementId: "G-J9LX9WMPJK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.loginWithCredentials = async () => {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorDiv = document.getElementById("errorMessage");
+
+      errorDiv.innerText = "";
+
+      if (!username || !password) {
+        errorDiv.innerText = "Please enter both username and password.";
+        return;
+      }
+
+      try {
+        const userRef = doc(db, "users", username);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          errorDiv.innerText = "Username not found.";
+          return;
+        }
+
+        const userData = userSnap.data();
+        
+        if (userData.banned === true) {
+          errorDiv.innerHTML = '<div class="banned-message">⛔ Your account has been BANNED<br>You cannot access this service.</div>';
+          console.log("Login blocked: User is banned");
+          return;
+        }
+
+        const userEmail = userData.email;
+
+        const result = await signInWithEmailAndPassword(auth, userEmail, password);
+        
+        alert("Login successful!");
+        window.location.href = "earn.html";
+      } catch (err) {
+        console.error("Login error:", err);
+        
+        if (err.code === "auth/invalid-credential") {
+          errorDiv.innerText = "Incorrect password.";
+        } else if (err.code === "auth/user-not-found") {
+          errorDiv.innerText = "User not found.";
+        } else if (err.code === "auth/too-many-requests") {
+          errorDiv.innerText = "Too many failed login attempts. Please try again later.";
+        } else {
+          errorDiv.innerText = "Login failed: " + err.message;
+        }
+      }
+    };
+
+    document.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        loginWithCredentials();
+      }
+    });
+  </script>
+</body>
+</html>
