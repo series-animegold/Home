@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Earn Points - AnimeGold</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: linear-gradient(-45deg, #1a0033, #2d0052, #0a0a2e, #16213e);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      font-family: 'Arial', sans-serif;
+      background-attachment: fixed;
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 152, 0, 0.5);
+      border-radius: 50%;
+      animation: float 20s infinite;
+    }
+
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 80%; top: 80%; animation-delay: 2s; }
+    .particle:nth-child(3) { left: 50%; top: 50%; animation-delay: 4s; }
+    .particle:nth-child(4) { left: 20%; top: 70%; animation-delay: 6s; }
+    .particle:nth-child(5) { left: 90%; top: 30%; animation-delay: 8s; }
+    .particle:nth-child(6) { left: 30%; top: 10%; animation-delay: 10s; }
+    .particle:nth-child(7) { left: 70%; top: 60%; animation-delay: 12s; }
+    .particle:nth-child(8) { left: 15%; top: 50%; animation-delay: 14s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translate(100px, -100px) scale(0.5); opacity: 0; }
+    }
+
+    h1 {
+      font-size: 2em;
+      margin: 30px 0 10px 0;
+      background: linear-gradient(135deg, #ff9800, #ffb84d, #ff6b00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glow 2s ease-in-out infinite;
+      text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 152, 0, 0.5)); }
+      50% { filter: drop-shadow(0 0 15px rgba(255, 152, 0, 0.8)); }
+    }
+
+    .section {
+      background: rgba(20, 20, 40, 0.85);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      box-shadow: 0 8px 32px rgba(255, 152, 0, 0.2), 0 0 50px rgba(255, 152, 0, 0.1);
+      margin: 20px auto;
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 900px;
+      animation: slideIn 0.6s ease-out;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section h2 {
+      color: #ffb84d;
+      margin-bottom: 15px;
+      font-size: 1.4em;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin: 10px 0;
+      font-size: 14px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .status-active {
+      background: rgba(39, 174, 96, 0.4);
+      border: 2px solid #27ae60;
+      box-shadow: 0 0 15px rgba(39, 174, 96, 0.5);
+    }
+
+    .status-inactive {
+      background: rgba(149, 165, 166, 0.4);
+      border: 2px solid #95a5a6;
+      box-shadow: 0 0 15px rgba(149, 165, 166, 0.3);
+    }
+
+    .eligibility {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 152, 0, 0.05));
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      padding: 20px;
+      border-radius: 10px;
+      width: 160px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.2);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+      border-color: #ff9800;
+    }
+
+    .card h3 {
+      margin: 0 0 10px 0;
+      color: #ffb84d;
+      font-size: 16px;
+    }
+
+    .card p {
+      color: #b0b0ff;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    .card button {
+      background: #ff9800;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #000;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .card button:hover {
+      background: #ffb84d;
+      transform: scale(1.05);
+    }
+
+    select {
+      padding: 10px 15px;
+      margin: 10px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    select:focus {
+      border-color: #ff9800;
+      background: rgba(255, 152, 0, 0.1);
+      outline: none;
+    }
+
+    select option {
+      background: #1a0033;
+      color: #fff;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+      animation: spinSlow 3s linear infinite;
+    }
+
+    @keyframes spinSlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(255, 152, 0, 0.6), inset 0 0 30px rgba(255, 152, 0, 0.2);
+      transform: rotate(0deg);
+      background: conic-gradient(
+        from 0deg,
+        #ff9800 0deg 40deg,
+        #ff9800 40deg 80deg,
+        #ff9800 80deg 120deg,
+        #ff9800 120deg 160deg,
+        #ff9800 160deg 200deg,
+        #ff9800 200deg 240deg,
+        #ff9800 240deg 280deg,
+        #ff9800 280deg 320deg,
+        #ff9800 320deg 360deg
+      );
+    }
+
+    .wheel-segment {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(50% 50%, 50% 0%, 100% 0%);
+      transform-origin: 50% 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #111;
+      font-size: 14px;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 20px solid #ffb84d;
+      z-index: 10;
+      filter: drop-shadow(0 0 5px rgba(255, 180, 77, 0.8));
+    }
+
+    .spin-button {
+      background: linear-gradient(135deg, #27ae60, #2ecc71);
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      margin: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+    }
+
+    .spin-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(39, 174, 96, 0.6);
+    }
+
+    .spin-button:disabled {
+      background: #95a5a6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    button {
+      margin: 8px 5px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #ff9800, #ffb84d);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(255, 152, 0, 0.6);
+    }
+
+    button.admin-btn {
+      background: linear-gradient(135deg, #c0392b, #e74c3c);
+      color: #fff;
+    }
+
+    button.admin-btn:hover {
+      box-shadow: 0 6px 25px rgba(192, 57, 43, 0.6);
+    }
+
+    #seriesFrame {
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      border-radius: 10px;
+      margin: 15px 0;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.2);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 0 50px rgba(255, 152, 0, 0.3);
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+      color: #ffb84d;
+    }
+
+    .modal-content button {
+      margin: 10px 5px;
+      padding: 10px 20px;
+    }
+
+    .modal-content button.close {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: #fff;
+    }
+
+    .banned-message {
+      background: rgba(192, 57, 43, 0.3);
+      border: 2px solid rgba(192, 57, 43, 0.8);
+      padding: 25px;
+      border-radius: 10px;
+      margin: 30px;
+      position: relative;
+      z-index: 1;
+      animation: pulse-ban 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ban {
+      0%, 100% { box-shadow: 0 0 15px rgba(192, 57, 43, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(192, 57, 43, 0.7); }
+    }
+
+    .notifications-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 0;
+      margin: 0;
+    }
+
+    .notification {
+      background: linear-gradient(135deg, #ff9800, #ffb84d);
+      padding: 20px 40px;
+      width: 100%;
+      box-sizing: border-box;
+      animation: slideInDown 0.5s ease-out, slideOutUp 0.5s ease-in 4.5s forwards;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+    }
+
+    .notification-text {
+      color: #000;
+      font-weight: bold;
+      font-size: 18px;
+      margin: 0;
+    }
+
+    @keyframes slideInDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOutUp {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+    }
+
+    body.notification-active {
+      padding-top: 60px;
+    }
+
+    .spin-result {
+      background: rgba(255, 152, 0, 0.1);
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px auto;
+      width: fit-content;
+      font-size: 18px;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    p {
+      color: #b0b0ff;
+      margin: 10px 0;
+    }
+
+    iframe {
+      border-radius: 10px;
+    }
+
+    .interaction-stats {
+      background: rgba(255, 152, 0, 0.1);
+      border: 1px solid rgba(255, 152, 0, 0.3);
+      padding: 10px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .interaction-stats p {
+      margin: 5px 0;
+      color: #ffb84d;
+    }
+  </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6qQybRVw4nlwGA-Kp8d6kCqOhdqo11Aw",
+      authDomain: "animegold-bf2a7.firebaseapp.com",
+      projectId: "animegold-bf2a7",
+      storageBucket: "animegold-bf2a7.firebasestorage.app",
+      messagingSenderId: "1055086176557",
+      appId: "1:1055086176557:web:aca8f68412e95ef369cba4",
+      measurementId: "G-J9LX9WMPJK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let userRef, userData = {}, minuteCounter = 0, watching = false, updateInterval;
+    let isSpinning = false;
+    let currentUserName = "User";
+    let currentRotation = 0;
+    let heartbeatInterval;
+    let lastHeartbeatTime = Date.now();
+
+    // ✅ NEW: Watch Session Tracking
+    let currentWatchSession = null;
+    let interactionStats = {
+      clicks: 0,
+      touches: 0,
+      mouseEnters: 0,
+      totalFocusTime: 0,
+      lastInteractionTime: Date.now(),
+      iframeInView: false
+    };
+
+    const pinoyUsernames = [
+      'MariaSantos', 'juan_dela_cruz', 'RosaMaria23', 'CarlosGutierrez', 'AnaLuisa',
+      'PedroRamos42', 'MarianoSotz', 'Corazon89', 'AmeliaLovit', 'ErnestoMed',
+      'ElenaNiel', 'DiegoOrtiz', 'SofiaRamos', 'Ramon_Cruz', 'AuroraLight99',
+      'JavierSykes', 'CarmenRose', 'FernandoMax', 'CatalinaMS', 'RubenNeil',
+      'DoloresRay', 'VicenteMarcos', 'ManuelaLynn', 'ArturoVega88', 'RositaRay',
+      'SergioPena', 'AngelinaMa', 'AlexanderDe', 'MarcosJuan77', 'LuisaMarie',
+      'RafaelGod', 'IsabellaGrace', 'BernardoRam', 'CristinaLee', 'DavidMark55',
+      'EstherMay', 'FelipeSuarez', 'GabrielRod', 'HenrietteMay', 'IanAntonio66',
+      'JesusPena', 'KarlaMina', 'LeonardoSan', 'MartinezPhi99', 'NorbertoMax'
+    ];
+
+    const rewards = [100, 200, 500, 1000];
+
+    const wheelPrizes = [
+      { points: 0.20, chance: 60 },
+      { points: 0.50, chance: 35 },
+      { points: 0.80, chance: 4.9 },
+      { points: 1, chance: 0.08 },
+      { points: 1, chance: 0.008 },
+      { points: 1, chance: 0.0015 },
+      { points: 1, chance: 0.0004 },
+      { points: 0.80, chance: 0.0002 },
+      { points: 0.20, chance: 0.0000001 }
+    ];
+
+    function getRandomBotUsername() {
+      return pinoyUsernames[Math.floor(Math.random() * pinoyUsernames.length)];
+    }
+
+    function getRandomReward() {
+      return rewards[Math.floor(Math.random() * rewards.length)];
+    }
+
+    function showNotification(message) {
+      const container = document.getElementById('notificationsContainer');
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.innerHTML = `<p class="notification-text">${message}</p>`;
+      container.appendChild(notification);
+      
+      document.body.classList.add('notification-active');
+
+      setTimeout(() => {
+        notification.remove();
+        if (container.children.length === 0) {
+          document.body.classList.remove('notification-active');
+        }
+      }, 5000);
+    }
+
+    function createWheel() {
+      const wheelDiv = document.getElementById('wheel');
+      wheelDiv.innerHTML = '';
+      
+      const segmentAngle = 360 / wheelPrizes.length;
+      wheelPrizes.forEach((prize, index) => {
+        const segment = document.createElement('div');
+        segment.className = 'wheel-segment';
+        segment.style.transform = `rotate(${segmentAngle * index}deg)`;
+        segment.textContent = '₱' + prize.points;
+        wheelDiv.appendChild(segment);
+      });
+      
+      currentRotation = 0;
+      wheelDiv.style.transition = 'none';
+      wheelDiv.style.transform = `rotate(${currentRotation}deg)`;
+    }
+
+    function getRandomPrize() {
+      const random = Math.random() * 100;
+      let cumulative = 0;
+      
+      for (let prize of wheelPrizes) {
+        cumulative += prize.chance;
+        if (random <= cumulative) {
+          return prize;
+        }
+      }
+      
+      return wheelPrizes[0];
+    }
+
+    function startBotClaims() {
+      setInterval(() => {
+        const botUsername = getRandomBotUsername();
+        const reward = getRandomReward();
+        showNotification(`🎉 ${botUsername} claimed ₱${reward}!`);
+      }, Math.random() * 20000 + 10000);
+    }
+
+    function startHeartbeat() {
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+      
+      heartbeatInterval = setInterval(async () => {
+        lastHeartbeatTime = Date.now();
+        if (userRef) {
+          try {
+            await setDoc(userRef, { lastSeen: new Date().toISOString() }, { merge: true });
+            console.log("✅ Heartbeat sent");
+          } catch (err) {
+            console.error("❌ Heartbeat failed - user may be offline");
+            try {
+              await setDoc(userRef, { activityStatus: "inactive" }, { merge: true });
+            } catch (e) {
+              console.error("Could not update status");
+            }
+          }
+        }
+      }, 5000);
+    }
+
+    function stopHeartbeat() {
+      if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = null;
+      }
+    }
+
+    // ✅ NEW: Interaction tracking functions
+    window.trackInteraction = async function(type) {
+      if (!currentWatchSession) return;
+      
+      if (type === 'click') interactionStats.clicks++;
+      if (type === 'touch') interactionStats.touches++;
+      if (type === 'mouseenter') interactionStats.mouseEnters++;
+      
+      interactionStats.lastInteractionTime = Date.now();
+      
+      try {
+        await setDoc(userRef, {
+          lastInteraction: new Date().toISOString(),
+          interactionData: interactionStats
+        }, { merge: true });
+      } catch (err) {
+        console.error("Error tracking interaction:", err);
+      }
+    };
+
+    window.addEventListener('blur', async () => {
+      if (watching && userRef) {
+        stopHeartbeat();
+        try {
+          await setDoc(userRef, { activityStatus: "away" }, { merge: true });
+        } catch (err) {
+          console.error("Error setting status to away:", err);
+        }
+      }
+    });
+
+    window.addEventListener('focus', async () => {
+      if (watching && userRef) {
+        startHeartbeat();
+        try {
+          await setDoc(userRef, { activityStatus: "active" }, { merge: true });
+        } catch (err) {
+          console.error("Error setting status to active:", err);
+        }
+      }
+    });
+
+    document.addEventListener('visibilitychange', async () => {
+      if (document.hidden) {
+        stopHeartbeat();
+        if (userRef && watching) {
+          try {
+            await setDoc(userRef, { activityStatus: "inactive" }, { merge: true });
+            console.log("📵 User marked as inactive (page hidden)");
+          } catch (err) {
+            console.error("Error setting status to inactive:", err);
+          }
+        }
+      } else {
+        if (watching && userRef) {
+          startHeartbeat();
+          try {
+            await setDoc(userRef, { activityStatus: "active" }, { merge: true });
+            console.log("🟢 User marked as active (page visible)");
+          } catch (err) {
+            console.error("Error setting status to active:", err);
+          }
+        }
+      }
+    });
+
+    window.spinWheel = async () => {
+      const pts = minuteCounter / 300;
+      
+      if (pts < 1) {
+        alert("You need at least 1 point to spin!");
+        return;
+      }
+
+      if (isSpinning) {
+        alert("Already spinning...");
+        return;
+      }
+
+      isSpinning = true;
+      document.getElementById('spinBtn').disabled = true;
+
+      try {
+        minuteCounter -= 300;
+        await setDoc(userRef, { minuteCounter }, { merge: true });
+
+        const wheel = document.getElementById('wheel');
+        wheel.style.transition = 'none';
+        wheel.style.transform = `rotate(${currentRotation}deg)`;
+        void wheel.offsetWidth;
+        
+        const spins = 10;
+        const extraDegrees = Math.floor(Math.random() * 360);
+        const totalRotation = spins * 360 + extraDegrees;
+        
+        wheel.style.transition = 'transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        wheel.style.transform = `rotate(${currentRotation + totalRotation}deg)`;
+
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        currentRotation = (currentRotation + totalRotation) % 360;
+
+        const winningIndex = Math.floor((360 - (extraDegrees % 360)) / (360 / wheelPrizes.length)) % wheelPrizes.length;
+        const prize = wheelPrizes[winningIndex];
+
+        const pointsToAdd = prize.points * 300;
+        minuteCounter += pointsToAdd;
+
+        await setDoc(userRef, { minuteCounter }, { merge: true });
+
+        document.getElementById('resultText').innerText = `🎉 You Won: ₱${prize.points}!`;
+        document.getElementById('resultModal').style.display = 'flex';
+
+        updateUI();
+      } catch (err) {
+        alert("Error during spin: " + err.message);
+      } finally {
+        isSpinning = false;
+        document.getElementById('spinBtn').disabled = false;
+      }
+    };
+
+    window.closeResultModal = () => {
+      document.getElementById('resultModal').style.display = 'none';
+    };
+
+    onAuthStateChanged(auth, async (u) => {
+      if (u) {
+        const usersSnap = await getDocs(query(collection(db, "users"), where("uid", "==", u.uid)));
+        
+        if (!usersSnap.empty) {
+          const userDoc = usersSnap.docs[0];
+          userRef = doc(db, "users", userDoc.id);
+          userData = userDoc.data();
+
+          currentUserName = userData.userName || "User";
+
+          if (userData.banned === true) {
+            document.body.innerHTML = `
+              <div class="banned-message">
+                <h1>⛔ Account Banned</h1>
+                <p>Your account has been banned and you cannot access this service.</p>
+                <p>If you believe this is an error, please contact support.</p>
+                <button onclick="logout()" style="background:#ff9800; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Logout</button>
+              </div>
+            `;
+            return;
+          }
+
+          document.getElementById("greeting").innerText =
+            "Hello, " + currentUserName + "!";
+
+          minuteCounter = userData.minuteCounter || 0;
+          createWheel();
+          updateUI();
+          startBotClaims();
+          startHeartbeat();
+
+          if (u.email === "shadowtrimz@gmail.com") {
+            const adminBtn = document.getElementById("adminBtn");
+            adminBtn.style.display = "inline-block";
+          }
+        } else {
+          console.error("User not found in Firestore");
+          window.location.href = "index.html";
+        }
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+
+    window.loadSeries = async () => {
+      document.getElementById("seriesFrame").src =
+        document.getElementById("seriesSelect").value;
+      watching = true;
+      startHeartbeat();
+
+      // ✅ NEW: Create watch session
+      currentWatchSession = {
+        seriesName: document.getElementById("seriesSelect").options[document.getElementById("seriesSelect").selectedIndex].text,
+        startTime: new Date().toISOString(),
+        pointsEarnedAtStart: minuteCounter / 300
+      };
+
+      interactionStats = {
+        clicks: 0,
+        touches: 0,
+        mouseEnters: 0,
+        totalFocusTime: 0,
+        lastInteractionTime: Date.now(),
+        iframeInView: false
+      };
+
+      await setDoc(userRef, { 
+        activityStatus: "active", 
+        lastActivityTime: new Date().toISOString(),
+        currentWatchSession: currentWatchSession,
+        interactionData: interactionStats
+      }, { merge: true });
+
+      document.getElementById("statusBadge").textContent = "🟢 ACTIVE";
+      document.getElementById("statusBadge").className = "status-badge status-active";
+
+      // ✅ NEW: Add interaction event listeners to iframe
+      const seriesFrame = document.getElementById("seriesFrame");
+      seriesFrame.addEventListener('click', () => trackInteraction('click'));
+      seriesFrame.addEventListener('touchstart', () => trackInteraction('touch'));
+      seriesFrame.addEventListener('mouseenter', () => trackInteraction('mouseenter'));
+
+      if (updateInterval) clearInterval(updateInterval);
+      updateInterval = setInterval(async () => {
+        if (watching) {
+          minuteCounter++;
+          await setDoc(userRef, { 
+            minuteCounter, 
+            lastActivityTime: new Date().toISOString(),
+            interactionData: interactionStats
+          }, { merge: true });
+          updateUI();
+          updateInteractionDisplay();
+        }
+      }, 60000);
+    };
+
+    // ✅ NEW: Display interaction stats
+    window.updateInteractionDisplay = function() {
+      const statsDiv = document.getElementById("interactionStats");
+      if (statsDiv && currentWatchSession) {
+        const sessionDuration = Math.floor((Date.now() - Date.parse(currentWatchSession.startTime)) / 1000 / 60);
+        const currentPoints = (minuteCounter / 300).toFixed(4);
+        const pointsEarned = currentPoints - currentWatchSession.pointsEarnedAtStart;
+
+        statsDiv.innerHTML = `
+          <p><strong>Series:</strong> ${currentWatchSession.seriesName}</p>
+          <p><strong>Watch Time:</strong> ${sessionDuration} minutes</p>
+          <p><strong>Interactions:</strong> ${interactionStats.clicks} clicks + ${interactionStats.touches} touches</p>
+          <p><strong>Points This Session:</strong> ${pointsEarned.toFixed(4)}</p>
+          <p><strong>Session Status:</strong> 🟢 ACTIVE WATCHING</p>
+        `;
+      }
+    };
+
+    window.stopWatching = async () => {
+      watching = false;
+      stopHeartbeat();
+      if (updateInterval) clearInterval(updateInterval);
+
+      // ✅ NEW: Save final session data
+      if (currentWatchSession) {
+        const sessionDuration = Math.floor((Date.now() - Date.parse(currentWatchSession.startTime)) / 1000 / 60);
+        const pointsEarned = (minuteCounter / 300) - currentWatchSession.pointsEarnedAtStart;
+        
+        try {
+          await setDoc(userRef, {
+            watchSessions: arrayUnion({
+              series: currentWatchSession.seriesName,
+              startTime: currentWatchSession.startTime,
+              endTime: new Date().toISOString(),
+              durationMinutes: sessionDuration,
+              pointsEarned: pointsEarned,
+              interactions: interactionStats,
+              verificationScore: calculateVerificationScore(sessionDuration, pointsEarned, interactionStats)
+            })
+          }, { merge: true });
+        } catch (err) {
+          console.error("Error saving watch session:", err);
+        }
+
+        currentWatchSession = null;
+      }
+
+      await setDoc(userRef, { activityStatus: "inactive" }, { merge: true });
+
+      document.getElementById("statusBadge").textContent = "⚫ INACTIVE";
+      document.getElementById("statusBadge").className = "status-badge status-inactive";
+
+      document.getElementById("seriesFrame").src = "";
+      document.getElementById("interactionStats").innerHTML = "";
+      alert("Stopped watching. Status set to Inactive.");
+    };
+
+    // ✅ NEW: Calculate verification score (0-100)
+    function calculateVerificationScore(durationMinutes, pointsEarned, stats) {
+      let score = 100;
+      
+      // Expected: 1 point per minute
+      const expectedPoints = durationMinutes * (1/60); // ~0.016 per minute
+      const pointsRatio = pointsEarned / (expectedPoints > 0 ? expectedPoints : 1);
+      
+      if (pointsRatio > 2) score -= 30; // Too many points for time
+      if (pointsRatio < 0.5) score -= 15; // Too few points
+      
+      // Expected: at least 2 interactions per 10 minutes
+      const expectedInteractions = durationMinutes / 5;
+      const totalInteractions = stats.clicks + stats.touches + stats.mouseEnters;
+      if (totalInteractions < expectedInteractions * 0.5) score -= 20; // Too few interactions
+      
+      return Math.max(0, score);
+    }
+
+    async function updateUI() {
+      const snap = await getDoc(userRef);
+      if (snap.exists()) userData = snap.data();
+      
+      const pointsEarned = (minuteCounter / 300).toFixed(4);
+      document.getElementById("points").innerText =
+        pointsEarned + " points";
+      document.getElementById("pending").innerText =
+        userData.pendingEarnings || 0;
+      document.getElementById("total").innerText =
+        userData.totalEarnings || 0;
+
+      const status = userData.activityStatus || "inactive";
+      if (status === "active") {
+        document.getElementById("statusBadge").textContent = "🟢 ACTIVE";
+        document.getElementById("statusBadge").className = "status-badge status-active";
+      } else {
+        document.getElementById("statusBadge").textContent = "⚫ INACTIVE";
+        document.getElementById("statusBadge").className = "status-badge status-inactive";
+      }
+    }
+
+    window.claimReward = async (cost) => {
+      const pts = minuteCounter / 300;
+
+      if (!userData.payoutMethod || !userData.payoutNumber || !userData.payoutName) {
+        alert("❌ Please set up your payout info first!");
+        return;
+      }
+
+      if (pts >= cost) {
+        const newPending = (userData.pendingEarnings || 0) + cost;
+        minuteCounter -= cost * 300;
+        await setDoc(userRef, { minuteCounter, pendingEarnings: newPending }, { merge: true });
+        
+        const displayName = userData.userName || "User";
+        showNotification(`🎉 ${displayName} claimed ₱${cost}!`);
+        
+        alert("✅ ₱" + cost + " added to Pending Earnings for " +
+              displayName + " via " + userData.payoutMethod + "!");
+        updateUI();
+      } else {
+        alert("❌ Not enough points yet!");
+      }
+    };
+
+    window.logout = () => signOut(auth).then(async () => {
+      stopHeartbeat();
+      if (userRef) {
+        await setDoc(userRef, { activityStatus: "inactive" }, { merge: true });
+      }
+      window.location.href = "index.html";
+    });
+  </script>
+</head>
+<body>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div id="notificationsContainer" class="notifications-container"></div>
+
+  <h1 id="greeting">Loading...</h1>
+  
+  <div class="section">
+    <div id="statusBadge" class="status-badge status-inactive">⚫ INACTIVE</div>
+    <p>Total Points: <span id="points">0.0000 points</span></p>
+    <p>Pending Earnings: ₱<span id="pending">0</span></p>
+    <p>Total Earnings: ₱<span id="total">0</span></p>
+  </div>
+
+  <div class="section">
+    <h2>👀 Watch Series</h2>
+    <select id="seriesSelect">
+      <option value="https://trimz.tv/system-analyzer?ep=1">System Analyzer</option>
+      <option value="https://trimz.tv/the-gamer?ep=1">The Gamer</option>
+      <option value="https://trimz.tv/99-reinforced-wooden-stick?ep=1">+99 Reinforced Wooden Stick</option>
+      <option value="https://trimz.tv/slam-jam?ep=1">Slam Jam</option>
+      <option value="https://trimz.tv/guardians-of-rokia?ep=1">Guardians of Rokia</option>
+      <option value="https://trimz.tv/lifeexe?ep=1">Life.exe</option>
+    </select>
+    <div style="margin-top:20px;">
+      <iframe id="seriesFrame" width="640" height="360" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <!-- ✅ NEW: Show interaction stats while watching -->
+    <div id="interactionStats" class="interaction-stats"></div>
+
+    <button onclick="loadSeries()">Load</button>
+    <button onclick="stopWatching()" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff;">Stop Watching</button>
+  </div>
+
+  <div class="section">
+    <h2>🎡 Spin the Wheel</h2>
+    <p style="font-size:14px; color:#ff9800;">Cost: 1 point per spin</p>
+    <div class="wheel-container">
+      <div class="pointer"></div>
+      <div class="wheel" id="wheel"></div>
+    </div>
+    <button class="spin-button" id="spinBtn" onclick="spinWheel()">🎡 SPIN</button>
+  </div>
+
+  <div class="section">
+    <h2>💰 Rewards</h2>
+    <div class="eligibility">
+      <div class="card"><h3>Reward ₱100</h3><p>Cost: 100 points</p><button onclick="claimReward(100)">Claim</button></div>
+      <div class="card"><h3>Reward ₱200</h3><p>Cost: 200 points</p><button onclick="claimReward(200)">Claim</button></div>
+      <div class="card"><h3>Reward ₱500</h3><p>Cost: 500 points</p><button onclick="claimReward(500)">Claim</button></div>
+      <div class="card"><h3>Reward ₱1000</h3><p>Cost: 1000 points</p><button onclick="claimReward(1000)">Claim</button></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <button onclick="window.location.href='payout.html'">💳 Update Payout Info</button>
+    <button id="adminBtn" class="admin-btn" onclick="window.location.href='admin.html'" style="display:none;">🚀 Admin Dashboard</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <h2>Spin Result!</h2>
+      <div id="resultText" style="font-size:24px; margin:20px 0; color:#27ae60;"></div>
+      <button onclick="closeResultModal()" class="close">Close</button>
+    </div>
+  </div>
+</body>
+</html>
