@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AnimeGold - Sign Up</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: linear-gradient(-45deg, #1a0033, #2d0052, #0a0a2e, #16213e);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+      overflow-y: auto;
+      padding: 20px 0;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 152, 0, 0.5);
+      border-radius: 50%;
+      animation: float 20s infinite;
+    }
+
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 80%; top: 80%; animation-delay: 2s; }
+    .particle:nth-child(3) { left: 50%; top: 50%; animation-delay: 4s; }
+    .particle:nth-child(4) { left: 20%; top: 70%; animation-delay: 6s; }
+    .particle:nth-child(5) { left: 90%; top: 30%; animation-delay: 8s; }
+    .particle:nth-child(6) { left: 30%; top: 10%; animation-delay: 10s; }
+    .particle:nth-child(7) { left: 70%; top: 60%; animation-delay: 12s; }
+    .particle:nth-child(8) { left: 15%; top: 50%; animation-delay: 14s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translate(100px, -100px) scale(0.5); opacity: 0; }
+    }
+
+    .section {
+      background: rgba(20, 20, 40, 0.8);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      box-shadow: 0 8px 32px rgba(255, 152, 0, 0.2), 0 0 50px rgba(255, 152, 0, 0.1);
+      padding: 40px 35px;
+      border-radius: 15px;
+      text-align: center;
+      max-width: 420px;
+      animation: slideUp 0.8s ease-out;
+      z-index: 1;
+      margin: 20px auto;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ff9800, #ffb84d, #ff6b00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+      animation: glow 2s ease-in-out infinite;
+      font-weight: bold;
+    }
+
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 152, 0, 0.5)); }
+      50% { filter: drop-shadow(0 0 20px rgba(255, 152, 0, 0.8)); }
+    }
+
+    p {
+      color: #b0b0ff;
+      margin-bottom: 15px;
+      font-size: 0.95em;
+      letter-spacing: 0.5px;
+    }
+
+    input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px 15px;
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #ff9800;
+      background: rgba(255, 152, 0, 0.1);
+      box-shadow: 0 0 15px rgba(255, 152, 0, 0.4);
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    button {
+      width: 100%;
+      margin: 15px 0;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #ff9800, #ffb84d);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(255, 152, 0, 0.6);
+      background: linear-gradient(135deg, #ffb84d, #ff9800);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(255, 152, 0, 0.4);
+    }
+
+    .error { 
+      color: #ff4444; 
+      font-size: 13px; 
+      margin: 8px 0; 
+      min-height: 18px;
+      animation: shake 0.5s;
+    }
+
+    .success {
+      color: #27ae60;
+      font-size: 13px;
+      margin: 8px 0;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .password-requirements {
+      font-size: 11px;
+      color: #b0b0ff;
+      margin: 12px 0;
+      text-align: left;
+      display: inline-block;
+      background: rgba(255, 152, 0, 0.05);
+      padding: 10px 15px;
+      border-radius: 6px;
+      border-left: 3px solid rgba(255, 152, 0, 0.3);
+    }
+
+    .requirement {
+      margin: 4px 0;
+      transition: all 0.3s ease;
+    }
+
+    .requirement.met {
+      color: #27ae60;
+    }
+
+    .login-link {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 152, 0, 0.2);
+    }
+
+    .login-link p {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .login-link a {
+      color: #ffb84d;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .login-link a:after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #ffb84d;
+      transition: width 0.3s ease;
+    }
+
+    .login-link a:hover {
+      color: #ff9800;
+    }
+
+    .login-link a:hover:after {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="section">
+    <h1>⚡ AnimeGold</h1>
+    <p>Create Your Account</p>
+    
+    <input type="email" id="email" placeholder="Email Address" autocomplete="off"><br>
+    <input type="text" id="username" placeholder="Username (3-20 characters)" autocomplete="off"><br>
+    <input type="password" id="password" placeholder="Password" autocomplete="off"><br>
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" autocomplete="off"><br>
+    
+    <div class="password-requirements">
+      <div class="requirement" id="req-length">✗ At least 6 characters</div>
+      <div class="requirement" id="req-uppercase">✗ At least one uppercase letter</div>
+      <div class="requirement" id="req-number">✗ At least one number</div>
+    </div>
+    
+    <div id="errorMessage" class="error"></div>
+    <div id="successMessage" class="success"></div>
+    
+    <button onclick="signupWithCredentials()">Create Account</button>
+    
+    <div class="login-link">
+      <p>Already have an account? <a href="index.html">Login here</a></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB6qQybRVw4nlwGA-Kp8d6kCqOhdqo11Aw",
+      authDomain: "animegold-bf2a7.firebaseapp.com",
+      projectId: "animegold-bf2a7",
+      storageBucket: "animegold-bf2a7.firebasestorage.app",
+      messagingSenderId: "1055086176557",
+      appId: "1:1055086176557:web:aca8f68412e95ef369cba4",
+      measurementId: "G-J9LX9WMPJK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    setPersistence(auth, browserLocalPersistence);
+
+    function validatePassword(password) {
+      const requirements = {
+        length: password.length >= 6,
+        uppercase: /[A-Z]/.test(password),
+        number: /[0-9]/.test(password)
+      };
+
+      document.getElementById("req-length").className = requirements.length ? "requirement met" : "requirement";
+      document.getElementById("req-uppercase").className = requirements.uppercase ? "requirement met" : "requirement";
+      document.getElementById("req-number").className = requirements.number ? "requirement met" : "requirement";
+
+      document.getElementById("req-length").innerText = (requirements.length ? "✓" : "✗") + " At least 6 characters";
+      document.getElementById("req-uppercase").innerText = (requirements.uppercase ? "✓" : "✗") + " At least one uppercase letter";
+      document.getElementById("req-number").innerText = (requirements.number ? "✓" : "✗") + " At least one number";
+
+      return requirements.length && requirements.uppercase && requirements.number;
+    }
+
+    document.getElementById("password").addEventListener("input", (e) => {
+      validatePassword(e.target.value);
+    });
+
+    window.signupWithCredentials = async () => {
+      const email = document.getElementById("email").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+      const errorDiv = document.getElementById("errorMessage");
+      const successDiv = document.getElementById("successMessage");
+
+      errorDiv.innerText = "";
+      successDiv.innerText = "";
+
+      if (!email || !username || !password || !confirmPassword) {
+        errorDiv.innerText = "Please fill in all fields.";
+        return;
+      }
+
+      if (!email.includes("@")) {
+        errorDiv.innerText = "Please enter a valid email address.";
+        return;
+      }
+
+      if (username.length < 3 || username.length > 20) {
+        errorDiv.innerText = "Username must be between 3 and 20 characters.";
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        errorDiv.innerText = "Username can only contain letters, numbers, and underscores.";
+        return;
+      }
+
+      if (!validatePassword(password)) {
+        errorDiv.innerText = "Password does not meet requirements.";
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        errorDiv.innerText = "Passwords do not match.";
+        return;
+      }
+
+      try {
+        console.log("Creating Firebase Auth user...");
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        console.log("✅ Firebase Auth user created:", user.uid);
+
+        console.log("Writing user document to Firestore with username:", username);
+        const usernameRef = doc(db, "users", username);
+        await setDoc(usernameRef, {
+          uid: user.uid,
+          email: email,
+          userName: username,
+          password: password,
+          createdAt: new Date().toISOString(),
+          points: 0,
+          pendingEarnings: 0,
+          totalEarnings: 0,
+          minuteCounter: 0,
+          banned: false,
+          activityStatus: "inactive",
+          loginHistory: []
+        });
+        console.log("✅ User document created in Firestore");
+
+        successDiv.innerText = "Account created successfully! Redirecting to login...";
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 2000);
+      } catch (err) {
+        console.error("Signup error:", err);
+        console.error("Error code:", err.code);
+        console.error("Error message:", err.message);
+
+        if (err.code === "auth/email-already-in-use") {
+          errorDiv.innerText = "Email already registered. Please login or use a different email.";
+        } else if (err.code === "auth/invalid-email") {
+          errorDiv.innerText = "Invalid email format.";
+        } else if (err.code === "auth/weak-password") {
+          errorDiv.innerText = "Password is too weak. Please use a stronger password.";
+        } else if (err.code === "auth/operation-not-allowed") {
+          errorDiv.innerText = "Email/password sign up is disabled. Contact admin.";
+        } else if (err.code === "permission-denied") {
+          errorDiv.innerText = "Permission denied. Firestore rules may need updating. Try again.";
+        } else {
+          errorDiv.innerText = "Signup failed: " + err.message;
+        }
+      }
+    };
+
+    document.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        signupWithCredentials();
+      }
+    });
+  </script>
+</body>
+</html>
