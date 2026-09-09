@@ -65,12 +65,13 @@
     .strength-strong { background:#27ae60; color:#fff; }
     .info-text { font-size:12px; color:#ccc; margin:5px 0; text-align:left; }
     .error-text { color:#ff6b6b; font-size:12px; margin:5px 0; }
+    .success-text { color:#27ae60; font-size:12px; margin:5px 0; }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
     import { getFirestore, collection, getDocs, updateDoc, doc, getDoc, deleteDoc, query, where } 
       from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, updatePassword, reauthenticateWithCredential, EmailAuthProvider
+    import { getAuth, onAuthStateChanged, signOut
     } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
     const firebaseConfig = {
@@ -88,7 +89,7 @@
     const auth = getAuth(app);
     let allUsers = [];
     let currentEditUserId = null;
-    let currentEditUserEmail = null;
+    let currentEditUsername = null;
     let passwordVisibility = {};
 
     async function loadUsers() {
@@ -138,7 +139,7 @@
                 <button class="eye-btn" onclick="togglePasswordVisibility('${docSnap.id}')">👁️ Show</button>
                 <button class="copy-btn" onclick="copyPassword('${docSnap.id}')">📋 Copy</button>
               </div>
-              <button class="password-btn" onclick="editPassword('${docSnap.id}', '${data.email || ''}')">Change</button>
+              <button class="password-btn" onclick="editPassword('${docSnap.id}', '${data.userName || ''}')">Change</button>
             </div>
             <strong>Payout Method:</strong> ${data.payoutMethod || "Not set"}<br>
             <strong>Payout Name:</strong> ${data.payoutName || "Not set"}<br>
@@ -203,7 +204,7 @@
       });
     };
 
-    // Password strength checker
+    // Password strength checker (for display only, not validation)
     window.checkPasswordStrength = function(password) {
       let strength = 0;
       const feedback = [];
@@ -220,13 +221,13 @@
       }
 
       if (!/[A-Z]/.test(password)) {
-        feedback.push("⚠️ At least 1 uppercase letter (recommended)");
+        feedback.push("⚠️ At least 1 uppercase letter (optional)");
       } else {
         feedback.push("✅ Has uppercase");
       }
 
       if (!/[0-9]/.test(password)) {
-        feedback.push("⚠️ At least 1 number (recommended)");
+        feedback.push("⚠️ At least 1 number (optional)");
       } else {
         feedback.push("✅ Has number");
       }
@@ -261,12 +262,11 @@
       `;
     };
 
-    window.editPassword = function(uid, email) {
+    window.editPassword = function(uid, username) {
       currentEditUserId = uid;
-      currentEditUserEmail = email;
-      document.getElementById("passwordUserEmail").innerText = email || uid;
+      currentEditUsername = username;
+      document.getElementById("passwordUserUsername").innerText = username || uid;
       document.getElementById("changePasswordModal").style.display = "flex";
-      document.getElementById("currentPasswordInput").value = "";
       document.getElementById("newPasswordInput").value = "";
       document.getElementById("confirmPasswordInput").value = "";
       document.getElementById("passwordStrengthDisplay").innerHTML = "";
@@ -276,63 +276,49 @@
     window.closePasswordModal = function() {
       document.getElementById("changePasswordModal").style.display = "none";
       currentEditUserId = null;
-      currentEditUserEmail = null;
+      currentEditUsername = null;
     };
 
     window.saveNewPassword = async function() {
-      const currentPassword = document.getElementById("currentPasswordInput").value.trim();
       const newPassword = document.getElementById("newPasswordInput").value.trim();
       const confirmPassword = document.getElementById("confirmPasswordInput").value.trim();
       const errorDiv = document.getElementById("passwordErrorMessage");
 
       errorDiv.innerHTML = "";
 
-      if (!currentPassword || !newPassword || !confirmPassword) {
-        errorDiv.innerHTML = '<p class="error-text">❌ Please fill in all password fields!</p>';
+      if (!newPassword || !confirmPassword) {
+        errorDiv.innerHTML = '<p class="error-text">❌ Please fill in both password fields!</p>';
         return;
       }
 
       if (newPassword !== confirmPassword) {
-        errorDiv.innerHTML = '<p class="error-text">❌ New passwords do not match!</p>';
+        errorDiv.innerHTML = '<p class="error-text">❌ Passwords do not match!</p>';
         return;
       }
 
-      if (newPassword.length < 6) {
-        errorDiv.innerHTML = '<p class="error-text">❌ Password must be at least 6 characters long!</p>';
-        return;
-      }
-
-      if (currentPassword === newPassword) {
-        errorDiv.innerHTML = '<p class="error-text">❌ New password must be different from current password!</p>';
+      // Admin can set password as simple as 1 letter or 1 number
+      if (newPassword.length < 1) {
+        errorDiv.innerHTML = '<p class="error-text">❌ Password cannot be empty!</p>';
         return;
       }
 
       try {
-        // Step 1: Reauthenticate with current password
-        const credential = EmailAuthProvider.credential(currentEditUserEmail, currentPassword);
-        await reauthenticateWithCredential(auth.currentUser, credential);
+        errorDiv.innerHTML = '<p class="success-text">⏳ Updating password for ' + currentEditUsername + '...</p>';
 
-        errorDiv.innerHTML = '<p style="color:#f39c12;">⏳ Updating password...</p>';
-
-        // Step 2: Update Firebase Auth password
-        await updatePassword(auth.currentUser, newPassword);
-
-        // Step 3: Update password in Firestore
+        // Update password in Firestore using the current user ID
         const userRef = doc(db, "users", currentEditUserId);
         await updateDoc(userRef, { password: newPassword });
 
-        alert(`✅ Password changed successfully!\n\nThe user can now login with the new password.`);
-        closePasswordModal();
-        loadUsers();
+        errorDiv.innerHTML = '<p class="success-text">✅ Password changed successfully!</p>';
+        
+        setTimeout(() => {
+          alert(`✅ Password changed successfully for ${currentEditUsername}!\n\nThe user can now login with the new password.`);
+          closePasswordModal();
+          loadUsers();
+        }, 500);
       } catch (err) {
         console.error("Error:", err);
-        if (err.code === "auth/wrong-password" || err.message.includes("wrong password")) {
-          errorDiv.innerHTML = '<p class="error-text">❌ Current password is incorrect!</p>';
-        } else if (err.code === "auth/user-mismatch") {
-          errorDiv.innerHTML = '<p class="error-text">❌ User mismatch. Try logging out and back in.</p>';
-        } else {
-          errorDiv.innerHTML = `<p class="error-text">❌ Error: ${err.message}</p>`;
-        }
+        errorDiv.innerHTML = `<p class="error-text">❌ Error: ${err.message}</p>`;
       }
     };
 
@@ -675,20 +661,17 @@
   <!-- Change Password Modal -->
   <div id="changePasswordModal" class="modal">
     <div class="modal-content">
-      <h2>Change User Password</h2>
-      <p>User: <strong id="passwordUserEmail"></strong></p>
+      <h2>🔐 Change User Password</h2>
+      <p>Username: <strong id="passwordUserUsername"></strong></p>
       
-      <p style="text-align:left; font-size:12px; color:#ffb84d; font-weight:bold; margin:10px 0;">📝 Enter Current Password:</p>
-      <input type="password" id="currentPasswordInput" placeholder="Current Password" autocomplete="off">
-      
-      <p style="text-align:left; font-size:12px; color:#ffb84d; font-weight:bold; margin:10px 0;">🔐 Enter New Password:</p>
+      <p style="text-align:left; font-size:12px; color:#ffb84d; font-weight:bold; margin:15px 0;">Enter New Password:</p>
       <input type="password" id="newPasswordInput" placeholder="New Password" autocomplete="off" oninput="updatePasswordStrengthDisplay()">
       <input type="password" id="confirmPasswordInput" placeholder="Confirm New Password" autocomplete="off">
       
       <div id="passwordStrengthDisplay"></div>
       <div id="passwordErrorMessage"></div>
       
-      <p class="info-text">💡 Password must be at least 6 characters. Recommended: Uppercase + Numbers</p>
+      <p class="info-text">💡 Admin can set password as simple as 1 letter or 1 number!</p>
       
       <button onclick="saveNewPassword()" style="background:#9b59b6; width:100%;">Update Password</button>
       <button onclick="closePasswordModal()" style="background:#e74c3c; width:100%;">Cancel</button>
