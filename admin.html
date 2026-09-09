@@ -35,7 +35,7 @@
     .modal-content button { margin:10px 5px; padding:10px 20px; }
     .modal-content input { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none; box-sizing:border-box; }
     .modal-content select { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none; }
-    .modal-content textarea { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none; box-sizing:border-box; font-family:monospace; background:#222; color:#fff; resize:vertical; min-height:100px; }
+    .modal-content textarea { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none; box-sizing:border-box; font-family:monospace; background:#222; color:#fff; resize:vertical; m[...]
     .name-row { display:flex; gap:10px; align-items:center; margin:5px 0; }
     .password-row { display:flex; gap:10px; align-items:center; margin:5px 0; }
     .password-input-wrapper { display:flex; gap:5px; align-items:center; flex:1; }
@@ -59,6 +59,11 @@
     .fraud-high { background:#c0392b; color:#fff; }
     .fraud-medium { background:#f39c12; color:#000; }
     .fraud-low { background:#27ae60; color:#fff; }
+    .password-strength { margin:10px 0; padding:8px; border-radius:5px; font-size:12px; font-weight:bold; }
+    .strength-weak { background:#c0392b; color:#fff; }
+    .strength-medium { background:#f39c12; color:#000; }
+    .strength-strong { background:#27ae60; color:#fff; }
+    .info-text { font-size:12px; color:#ccc; margin:5px 0; text-align:left; }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
@@ -196,12 +201,71 @@
       });
     };
 
+    // Password strength checker
+    window.checkPasswordStrength = function(password) {
+      let strength = 0;
+      const feedback = [];
+
+      if (password.length >= 8) strength += 1;
+      if (/[A-Z]/.test(password)) strength += 1;
+      if (/[0-9]/.test(password)) strength += 1;
+      if (/[!@#$%^&*]/.test(password)) strength += 1;
+
+      if (password.length < 6) {
+        feedback.push("❌ At least 6 characters");
+      } else {
+        feedback.push("✅ Length OK");
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        feedback.push("❌ At least 1 uppercase letter (RECOMMENDED)");
+      } else {
+        feedback.push("✅ Has uppercase");
+      }
+
+      if (!/[0-9]/.test(password)) {
+        feedback.push("❌ At least 1 number (RECOMMENDED)");
+      } else {
+        feedback.push("✅ Has number");
+      }
+
+      return { strength, feedback };
+    };
+
+    window.updatePasswordStrengthDisplay = function() {
+      const newPassword = document.getElementById("newPasswordInput").value;
+      const strengthDiv = document.getElementById("passwordStrengthDisplay");
+      
+      if (!newPassword) {
+        strengthDiv.innerHTML = "";
+        return;
+      }
+
+      const { strength, feedback } = checkPasswordStrength(newPassword);
+      let strengthClass = "strength-weak";
+      let strengthText = "❌ WEAK";
+
+      if (strength >= 3) {
+        strengthClass = "strength-strong";
+        strengthText = "✅ STRONG";
+      } else if (strength >= 2) {
+        strengthClass = "strength-medium";
+        strengthText = "⚡ MEDIUM";
+      }
+
+      strengthDiv.innerHTML = `
+        <div class="password-strength ${strengthClass}">${strengthText}</div>
+        <div class="info-text">${feedback.join("<br>")}</div>
+      `;
+    };
+
     window.editPassword = function(uid, email) {
       currentEditUserId = uid;
       document.getElementById("passwordUserEmail").innerText = email || uid;
       document.getElementById("changePasswordModal").style.display = "flex";
       document.getElementById("newPasswordInput").value = "";
       document.getElementById("confirmPasswordInput").value = "";
+      document.getElementById("passwordStrengthDisplay").innerHTML = "";
     };
 
     window.closePasswordModal = function() {
@@ -228,6 +292,15 @@
         return;
       }
 
+      // For admin changes, bypass strength requirements but show a warning
+      const { strength } = checkPasswordStrength(newPassword);
+      if (strength < 3) {
+        const confirmWeak = confirm(`⚠️ WARNING: This password is weak!\n\nRecommendations:\n• Use at least 8 characters\n• Include uppercase letters (A-Z)\n• Include numbers (0-9)\n\nContinue anyway?`);
+        if (!confirmWeak) {
+          return;
+        }
+      }
+
       try {
         const userRef = doc(db, "users", currentEditUserId);
         const snap = await getDoc(userRef);
@@ -240,9 +313,10 @@
         const userData = snap.data();
         const userEmail = userData.email;
 
+        // Update password in Firestore
         await updateDoc(userRef, { password: newPassword });
 
-        alert(`✅ Password changed successfully for ${userData.userName || userData.email}!`);
+        alert(`✅ Password changed successfully for ${userData.userName || userData.email}!\n\nThe new password will work immediately on next login.`);
         closePasswordModal();
         loadUsers();
       } catch (err) {
@@ -592,8 +666,10 @@
     <div class="modal-content">
       <h2>Change User Password</h2>
       <p>User: <strong id="passwordUserEmail"></strong></p>
-      <input type="password" id="newPasswordInput" placeholder="New Password" autocomplete="off">
+      <input type="password" id="newPasswordInput" placeholder="New Password" autocomplete="off" oninput="updatePasswordStrengthDisplay()">
       <input type="password" id="confirmPasswordInput" placeholder="Confirm Password" autocomplete="off">
+      <div id="passwordStrengthDisplay"></div>
+      <p class="info-text">💡 Admin passwords have relaxed requirements, but stronger passwords are recommended!</p>
       <button onclick="saveNewPassword()" style="background:#9b59b6; width:100%;">Change Password</button>
       <button onclick="closePasswordModal()" style="background:#e74c3c; width:100%;">Cancel</button>
     </div>
