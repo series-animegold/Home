@@ -88,7 +88,6 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     let allUsers = [];
-    let currentEditUserId = null;
     let currentEditUsername = null;
     let passwordVisibility = {};
 
@@ -139,7 +138,7 @@
                 <button class="eye-btn" onclick="togglePasswordVisibility('${docSnap.id}')">👁️ Show</button>
                 <button class="copy-btn" onclick="copyPassword('${docSnap.id}')">📋 Copy</button>
               </div>
-              <button class="password-btn" onclick="editPassword('${docSnap.id}', '${data.userName || ''}')">Change</button>
+              <button class="password-btn" onclick="editPassword('${data.userName || ''}')">Change</button>
             </div>
             <strong>Payout Method:</strong> ${data.payoutMethod || "Not set"}<br>
             <strong>Payout Name:</strong> ${data.payoutName || "Not set"}<br>
@@ -204,78 +203,21 @@
       });
     };
 
-    // Password strength checker (for display only, not validation)
-    window.checkPasswordStrength = function(password) {
-      let strength = 0;
-      const feedback = [];
-
-      if (password.length >= 8) strength += 1;
-      if (/[A-Z]/.test(password)) strength += 1;
-      if (/[0-9]/.test(password)) strength += 1;
-      if (/[!@#$%^&*]/.test(password)) strength += 1;
-
-      if (password.length < 6) {
-        feedback.push("❌ At least 6 characters");
-      } else {
-        feedback.push("✅ Length OK");
-      }
-
-      if (!/[A-Z]/.test(password)) {
-        feedback.push("⚠️ At least 1 uppercase letter (optional)");
-      } else {
-        feedback.push("✅ Has uppercase");
-      }
-
-      if (!/[0-9]/.test(password)) {
-        feedback.push("⚠️ At least 1 number (optional)");
-      } else {
-        feedback.push("✅ Has number");
-      }
-
-      return { strength, feedback };
-    };
-
-    window.updatePasswordStrengthDisplay = function() {
-      const newPassword = document.getElementById("newPasswordInput").value;
-      const strengthDiv = document.getElementById("passwordStrengthDisplay");
-      
-      if (!newPassword) {
-        strengthDiv.innerHTML = "";
+    window.editPassword = function(username) {
+      if (!username) {
+        alert("Username not found!");
         return;
       }
-
-      const { strength, feedback } = checkPasswordStrength(newPassword);
-      let strengthClass = "strength-weak";
-      let strengthText = "❌ WEAK";
-
-      if (strength >= 3) {
-        strengthClass = "strength-strong";
-        strengthText = "✅ STRONG";
-      } else if (strength >= 2) {
-        strengthClass = "strength-medium";
-        strengthText = "⚡ MEDIUM";
-      }
-
-      strengthDiv.innerHTML = `
-        <div class="password-strength ${strengthClass}">${strengthText}</div>
-        <div class="info-text">${feedback.join("<br>")}</div>
-      `;
-    };
-
-    window.editPassword = function(uid, username) {
-      currentEditUserId = uid;
       currentEditUsername = username;
-      document.getElementById("passwordUserUsername").innerText = username || uid;
+      document.getElementById("passwordUserUsername").innerText = username;
       document.getElementById("changePasswordModal").style.display = "flex";
       document.getElementById("newPasswordInput").value = "";
       document.getElementById("confirmPasswordInput").value = "";
-      document.getElementById("passwordStrengthDisplay").innerHTML = "";
       document.getElementById("passwordErrorMessage").innerHTML = "";
     };
 
     window.closePasswordModal = function() {
       document.getElementById("changePasswordModal").style.display = "none";
-      currentEditUserId = null;
       currentEditUsername = null;
     };
 
@@ -296,17 +238,16 @@
         return;
       }
 
-      // Admin can set password as simple as 1 letter or 1 number
       if (newPassword.length < 1) {
         errorDiv.innerHTML = '<p class="error-text">❌ Password cannot be empty!</p>';
         return;
       }
 
       try {
-        errorDiv.innerHTML = '<p class="success-text">⏳ Updating password for ' + currentEditUsername + '...</p>';
+        errorDiv.innerHTML = '<p class="success-text">⏳ Updating password...</p>';
 
-        // Update password in Firestore using the current user ID
-        const userRef = doc(db, "users", currentEditUserId);
+        // Update password in Firestore using USERNAME as document ID (same as signup)
+        const userRef = doc(db, "users", currentEditUsername);
         await updateDoc(userRef, { password: newPassword });
 
         errorDiv.innerHTML = '<p class="success-text">✅ Password changed successfully!</p>';
@@ -665,10 +606,9 @@
       <p>Username: <strong id="passwordUserUsername"></strong></p>
       
       <p style="text-align:left; font-size:12px; color:#ffb84d; font-weight:bold; margin:15px 0;">Enter New Password:</p>
-      <input type="password" id="newPasswordInput" placeholder="New Password" autocomplete="off" oninput="updatePasswordStrengthDisplay()">
+      <input type="password" id="newPasswordInput" placeholder="New Password" autocomplete="off">
       <input type="password" id="confirmPasswordInput" placeholder="Confirm New Password" autocomplete="off">
       
-      <div id="passwordStrengthDisplay"></div>
       <div id="passwordErrorMessage"></div>
       
       <p class="info-text">💡 Admin can set password as simple as 1 letter or 1 number!</p>
