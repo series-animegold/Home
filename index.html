@@ -259,7 +259,6 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -273,7 +272,6 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
 
     window.loginWithCredentials = async () => {
@@ -289,6 +287,7 @@
       }
 
       try {
+        // Fetch user from Firestore using USERNAME as document ID
         const userRef = doc(db, "users", username);
         const userSnap = await getDoc(userRef);
 
@@ -299,30 +298,30 @@
 
         const userData = userSnap.data();
         
+        // Check if user is banned
         if (userData.banned === true) {
           errorDiv.innerHTML = '<div class="banned-message">⛔ Your account has been BANNED<br>You cannot access this service.</div>';
           console.log("Login blocked: User is banned");
           return;
         }
 
-        const userEmail = userData.email;
+        // Compare password directly from Firestore
+        const storedPassword = userData.password;
+        
+        if (password !== storedPassword) {
+          errorDiv.innerText = "Incorrect password.";
+          return;
+        }
 
-        const result = await signInWithEmailAndPassword(auth, userEmail, password);
+        // ✅ Login successful! Store username in localStorage
+        localStorage.setItem("loggedInUsername", username);
+        localStorage.setItem("loggedInEmail", userData.email);
         
         alert("Login successful!");
         window.location.href = "earn.html";
       } catch (err) {
         console.error("Login error:", err);
-        
-        if (err.code === "auth/invalid-credential") {
-          errorDiv.innerText = "Incorrect password.";
-        } else if (err.code === "auth/user-not-found") {
-          errorDiv.innerText = "User not found.";
-        } else if (err.code === "auth/too-many-requests") {
-          errorDiv.innerText = "Too many failed login attempts. Please try again later.";
-        } else {
-          errorDiv.innerText = "Login failed: " + err.message;
-        }
+        errorDiv.innerText = "Login failed: " + err.message;
       }
     };
 
