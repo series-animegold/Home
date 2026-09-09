@@ -30,12 +30,12 @@
     .status-inactive { background:#95a5a6; }
     .status-banned { background:#c0392b; }
     .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:999; }
-    .modal-content { background:#333; padding:30px; border-radius:10px; text-align:center; width:300px; }
+    .modal-content { background:#333; padding:30px; border-radius:10px; text-align:center; width:350px; max-height:90vh; overflow-y:auto; }
     .modal-content h2 { margin-top:0; }
     .modal-content button { margin:10px 5px; padding:10px 20px; }
     .modal-content input { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none; box-sizing:border-box; }
     .modal-content select { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none; }
-    .modal-content textarea { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none; box-sizing:border-box; font-family:monospace; background:#222; color:#fff; resize:vertical; m[...]
+    .modal-content textarea { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none; box-sizing:border-box; font-family:monospace; background:#222; color:#fff; resize:vertical; }
     .name-row { display:flex; gap:10px; align-items:center; margin:5px 0; }
     .password-row { display:flex; gap:10px; align-items:center; margin:5px 0; }
     .password-input-wrapper { display:flex; gap:5px; align-items:center; flex:1; }
@@ -64,12 +64,13 @@
     .strength-medium { background:#f39c12; color:#000; }
     .strength-strong { background:#27ae60; color:#fff; }
     .info-text { font-size:12px; color:#ccc; margin:5px 0; text-align:left; }
+    .error-text { color:#ff6b6b; font-size:12px; margin:5px 0; }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
     import { getFirestore, collection, getDocs, updateDoc, doc, getDoc, deleteDoc, query, where } 
       from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, signOut
+    import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, updatePassword, reauthenticateWithCredential, EmailAuthProvider
     } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
     const firebaseConfig = {
@@ -87,6 +88,7 @@
     const auth = getAuth(app);
     let allUsers = [];
     let currentEditUserId = null;
+    let currentEditUserEmail = null;
     let passwordVisibility = {};
 
     async function loadUsers() {
@@ -218,13 +220,13 @@
       }
 
       if (!/[A-Z]/.test(password)) {
-        feedback.push("❌ At least 1 uppercase letter (RECOMMENDED)");
+        feedback.push("⚠️ At least 1 uppercase letter (recommended)");
       } else {
         feedback.push("✅ Has uppercase");
       }
 
       if (!/[0-9]/.test(password)) {
-        feedback.push("❌ At least 1 number (RECOMMENDED)");
+        feedback.push("⚠️ At least 1 number (recommended)");
       } else {
         feedback.push("✅ Has number");
       }
@@ -261,67 +263,76 @@
 
     window.editPassword = function(uid, email) {
       currentEditUserId = uid;
+      currentEditUserEmail = email;
       document.getElementById("passwordUserEmail").innerText = email || uid;
       document.getElementById("changePasswordModal").style.display = "flex";
+      document.getElementById("currentPasswordInput").value = "";
       document.getElementById("newPasswordInput").value = "";
       document.getElementById("confirmPasswordInput").value = "";
       document.getElementById("passwordStrengthDisplay").innerHTML = "";
+      document.getElementById("passwordErrorMessage").innerHTML = "";
     };
 
     window.closePasswordModal = function() {
       document.getElementById("changePasswordModal").style.display = "none";
       currentEditUserId = null;
+      currentEditUserEmail = null;
     };
 
     window.saveNewPassword = async function() {
+      const currentPassword = document.getElementById("currentPasswordInput").value.trim();
       const newPassword = document.getElementById("newPasswordInput").value.trim();
       const confirmPassword = document.getElementById("confirmPasswordInput").value.trim();
+      const errorDiv = document.getElementById("passwordErrorMessage");
 
-      if (!newPassword || !confirmPassword) {
-        alert("Please fill in both password fields!");
+      errorDiv.innerHTML = "";
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        errorDiv.innerHTML = '<p class="error-text">❌ Please fill in all password fields!</p>';
         return;
       }
 
       if (newPassword !== confirmPassword) {
-        alert("Passwords do not match!");
+        errorDiv.innerHTML = '<p class="error-text">❌ New passwords do not match!</p>';
         return;
       }
 
       if (newPassword.length < 6) {
-        alert("Password must be at least 6 characters long!");
+        errorDiv.innerHTML = '<p class="error-text">❌ Password must be at least 6 characters long!</p>';
         return;
       }
 
-      // For admin changes, bypass strength requirements but show a warning
-      const { strength } = checkPasswordStrength(newPassword);
-      if (strength < 3) {
-        const confirmWeak = confirm(`⚠️ WARNING: This password is weak!\n\nRecommendations:\n• Use at least 8 characters\n• Include uppercase letters (A-Z)\n• Include numbers (0-9)\n\nContinue anyway?`);
-        if (!confirmWeak) {
-          return;
-        }
+      if (currentPassword === newPassword) {
+        errorDiv.innerHTML = '<p class="error-text">❌ New password must be different from current password!</p>';
+        return;
       }
 
       try {
+        // Step 1: Reauthenticate with current password
+        const credential = EmailAuthProvider.credential(currentEditUserEmail, currentPassword);
+        await reauthenticateWithCredential(auth.currentUser, credential);
+
+        errorDiv.innerHTML = '<p style="color:#f39c12;">⏳ Updating password...</p>';
+
+        // Step 2: Update Firebase Auth password
+        await updatePassword(auth.currentUser, newPassword);
+
+        // Step 3: Update password in Firestore
         const userRef = doc(db, "users", currentEditUserId);
-        const snap = await getDoc(userRef);
-        
-        if (!snap.exists()) {
-          alert("User not found!");
-          return;
-        }
-
-        const userData = snap.data();
-        const userEmail = userData.email;
-
-        // Update password in Firestore
         await updateDoc(userRef, { password: newPassword });
 
-        alert(`✅ Password changed successfully for ${userData.userName || userData.email}!\n\nThe new password will work immediately on next login.`);
+        alert(`✅ Password changed successfully!\n\nThe user can now login with the new password.`);
         closePasswordModal();
         loadUsers();
       } catch (err) {
-        alert("Error changing password: " + err.message);
-        console.error(err);
+        console.error("Error:", err);
+        if (err.code === "auth/wrong-password" || err.message.includes("wrong password")) {
+          errorDiv.innerHTML = '<p class="error-text">❌ Current password is incorrect!</p>';
+        } else if (err.code === "auth/user-mismatch") {
+          errorDiv.innerHTML = '<p class="error-text">❌ User mismatch. Try logging out and back in.</p>';
+        } else {
+          errorDiv.innerHTML = `<p class="error-text">❌ Error: ${err.message}</p>`;
+        }
       }
     };
 
@@ -666,11 +677,20 @@
     <div class="modal-content">
       <h2>Change User Password</h2>
       <p>User: <strong id="passwordUserEmail"></strong></p>
+      
+      <p style="text-align:left; font-size:12px; color:#ffb84d; font-weight:bold; margin:10px 0;">📝 Enter Current Password:</p>
+      <input type="password" id="currentPasswordInput" placeholder="Current Password" autocomplete="off">
+      
+      <p style="text-align:left; font-size:12px; color:#ffb84d; font-weight:bold; margin:10px 0;">🔐 Enter New Password:</p>
       <input type="password" id="newPasswordInput" placeholder="New Password" autocomplete="off" oninput="updatePasswordStrengthDisplay()">
-      <input type="password" id="confirmPasswordInput" placeholder="Confirm Password" autocomplete="off">
+      <input type="password" id="confirmPasswordInput" placeholder="Confirm New Password" autocomplete="off">
+      
       <div id="passwordStrengthDisplay"></div>
-      <p class="info-text">💡 Admin passwords have relaxed requirements, but stronger passwords are recommended!</p>
-      <button onclick="saveNewPassword()" style="background:#9b59b6; width:100%;">Change Password</button>
+      <div id="passwordErrorMessage"></div>
+      
+      <p class="info-text">💡 Password must be at least 6 characters. Recommended: Uppercase + Numbers</p>
+      
+      <button onclick="saveNewPassword()" style="background:#9b59b6; width:100%;">Update Password</button>
       <button onclick="closePasswordModal()" style="background:#e74c3c; width:100%;">Cancel</button>
     </div>
   </div>
